@@ -12,6 +12,7 @@
 
 * Improved `RSpec/ReturnFromStub` to handle string interpolation, hashes and do..end blocks. ([@Darhazer][])
 * Fixed compatibility with JRuby. ([@zverok][])
+* Add `FactoryGirl/CreateList` cop. ([@Darhazer][])
 
 ## 1.17.0 (2017-09-14)
 

@@ -339,3 +339,8 @@ FactoryGirl/DynamicAttributeDefinedStatically:
   Description: Prefer declaring dynamic attribute values in a block.
   Enabled: true
   StyleGuide: http://www.rubydoc.info/gems/rubocop-rspec/RuboCop/Cop/RSpec/FactoryGirl/DynamicAttributeDefinedStatically
+
+FactoryGirl/CreateList:
+  Description: Prefer using create_list over n.times { create :obj } calls.
+  Enabled: true
+  StyleGuide: http://www.rubydoc.info/gems/rubocop-rspec/RuboCop/Cop/RSpec/FactoryGirl/CreateList
