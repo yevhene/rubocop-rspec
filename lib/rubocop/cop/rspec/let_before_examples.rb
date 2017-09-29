@@ -47,6 +47,16 @@ module RuboCop
           check_let_declarations(node.body) if multiline_block?(node.body)
         end
 
+        def autocorrect(node)
+          lambda do |corrector|
+            first_example = find_first_example(node)
+            first_example_pos = first_example.loc.expression
+            indent = "\n" + ' ' * first_example.loc.column
+            corrector.insert_before(first_example_pos, source(node) + indent)
+            corrector.remove(node_range_with_surrounding_space(node))
+          end
+        end
+
         private
 
         def multiline_block?(block)
@@ -63,6 +73,39 @@ module RuboCop
               example_found = true
             end
           end
+        end
+
+        def find_first_example(node)
+          node.parent.children.find { |sibling| example_or_group?(sibling) }
+        end
+
+        def node_range(node)
+          range_between(node.loc.expression.begin_pos, last_node_loc(node))
+        end
+
+        def node_range_with_surrounding_space(node)
+          range = node_range(node)
+          range = range_with_surrounding_space(range, :left, false)
+          range = range_with_surrounding_space(range, :right, true)
+          range
+        end
+
+        def source(node)
+          node_range(node).source
+        end
+
+        def last_node_loc(node)
+          last_line = node.loc.end.line
+          heredoc_line(node) do |loc|
+            return loc.end_pos if loc.line > last_line
+          end
+          node.loc.end.end_pos
+        end
+
+        def heredoc_line(node, &block)
+          yield node.loc.heredoc_end if node.loc.respond_to?(:heredoc_end)
+
+          node.each_child_node { |child| heredoc_line(child, &block) }
         end
       end
     end
