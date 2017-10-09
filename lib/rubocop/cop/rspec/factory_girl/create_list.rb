@@ -21,14 +21,14 @@ module RuboCop
           def_node_matcher :n_times, '(send (int $_) :times)'
 
           def_node_matcher :times_block_without_args?, <<-PATTERN
-          (block
-            #n_times
-            (args)
-            ...
-          )
+            (block
+              #n_times
+              (args)
+              ...
+            )
           PATTERN
 
-          def_node_matcher :factory_call?, <<-PATTERN
+          def_node_matcher :factory_call, <<-PATTERN
             (send ${(const nil :FactoryGirl) nil} :create (sym $_) $...)
           PATTERN
 
@@ -36,7 +36,8 @@ module RuboCop
             return unless times_block_without_args?(node)
 
             receiver, _args, body = *node
-            return unless factory_call?(body)
+
+            return unless factory_call(body)
 
             add_offense(receiver, :expression)
           end
@@ -57,15 +58,32 @@ module RuboCop
             factory_call_replacement(body, count)
           end
 
+          def method_uses_parens?(node)
+            return false unless node.location.begin && node.location.end
+            node.location.begin.source == '(' && node.location.end.source == ')'
+          end
+
           def factory_call_replacement(body, count)
-            receiver, factory, options = *factory_call?(body)
-            replacement = receiver ? "#{receiver.source}." : ''
-            replacement += "create_list :#{factory}, #{count}"
-            if options.count > 0
-              additional_options = options.map(&:source).join(', ')
-              replacement += ", #{additional_options}"
+            receiver, factory, options = *factory_call(body)
+
+            replacement = ''
+            replacement += "#{receiver.source}." if receiver
+
+            arguments = ":#{factory}, #{count}"
+            options.each do |option|
+              arguments += ", #{option.source}"
             end
+
+            replacement += format_method_call(body, arguments)
             replacement
+          end
+
+          def format_method_call(node, arguments)
+            if method_uses_parens?(node)
+              "create_list(#{arguments})"
+            else
+              "create_list #{arguments}"
+            end
           end
         end
       end

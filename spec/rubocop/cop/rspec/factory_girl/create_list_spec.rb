@@ -44,8 +44,16 @@ RSpec.describe RuboCop::Cop::RSpec::FactoryGirl::CreateList do
       used_passwords = []
       3.times do
         u = create :user
-        expect(userd_passwords).not_to include(u.password)
+        expect(used_passwords).not_to include(u.password)
         used_passwords << u.password
+      end
+    RUBY
+  end
+
+  it 'ignores FactoryGirl.create calls with a block' do
+    expect_no_offenses(<<-RUBY)
+      3.times do
+        create(:user) { |user| create :account, user: user }
       end
     RUBY
   end
@@ -53,6 +61,10 @@ RSpec.describe RuboCop::Cop::RSpec::FactoryGirl::CreateList do
   include_examples 'autocorrect',
                    '5.times { create :user }',
                    'create_list :user, 5'
+
+  include_examples 'autocorrect',
+                   '5.times { create(:user, :trait) }',
+                   'create_list(:user, 5, :trait)'
 
   include_examples 'autocorrect',
                    '5.times { create :user, :trait, key: val }',

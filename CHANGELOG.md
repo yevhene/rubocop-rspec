@@ -2,6 +2,8 @@
 
 ## Master (Unreleased)
 
+* Add `FactoryGirl/CreateList` cop. ([@Darhazer][])
+
 ## 1.18.0 (2017-09-29)
 
 * Fix false positive in `Capybara/FeatureMethods`. ([@Darhazer][])
@@ -12,7 +14,6 @@
 
 * Improved `RSpec/ReturnFromStub` to handle string interpolation, hashes and do..end blocks. ([@Darhazer][])
 * Fixed compatibility with JRuby. ([@zverok][])
-* Add `FactoryGirl/CreateList` cop. ([@Darhazer][])
 
 ## 1.17.0 (2017-09-14)
 
