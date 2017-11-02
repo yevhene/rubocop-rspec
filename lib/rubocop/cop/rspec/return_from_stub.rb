@@ -82,7 +82,7 @@ module RuboCop
         end
 
         def dynamic?(node)
-          !node.recursive_literal?
+          node && !node.recursive_literal?
         end
       end
     end
